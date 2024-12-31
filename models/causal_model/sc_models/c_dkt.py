@@ -77,7 +77,9 @@ class TimeCausalRegulator(nn.Module):
         # 2. 构建因果矩阵 (seq_len, concept_num)
         #    使用 outer product, 可以节省显存
         causal_matrix = torch.outer(time_weights, concept_weights)#torch.sigmoid(torch.outer(time_weights, concept_weights))
-        self.step_norm_loss = self.l1_lambda * torch.norm(causal_matrix)
+
+        if self.training:
+            self.step_norm_loss = self.l1_lambda * torch.norm(causal_matrix)
 
         # 3. 根据sample_type进行采样
         if sample_type == "gumbel":

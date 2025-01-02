@@ -85,7 +85,7 @@ class TimeCausalRegulator(nn.Module):
         if sample_type == "gumbel":
             mask, out_concept_weight = self.gumbel_sample(causal_matrix, concepts)
         elif sample_type == "bernoulli":
-            mask = self.bernoulli_sample(causal_matrix, concept_embs)
+            mask, out_concept_weight = self.bernoulli_sample(causal_matrix, concepts)
         else:
             raise ValueError("Invalid sample_type. Choose 'gumbel' or 'bernoulli'.")
 
@@ -112,11 +112,17 @@ class TimeCausalRegulator(nn.Module):
 
         return mask, weight_matrix
 
-    def bernoulli_sample(self, probs):
-        """使用Bernoulli分布进行采样"""
-        mask = torch.bernoulli(probs)
-        return mask
+    def bernoulli_sample(self, logits, concepts):
+        batch_size, seq_len = concepts.size()
+        # Bernoulli 采样
+        probabilities = torch.sigmoid(logits) # 将logits转为概率
+        mask = torch.bernoulli(probabilities) # 根据概率进行二项分布采样
 
+        # 将采样后的mask转换成权重矩阵，这里我们假设被选中的为1，否则为0
+        weights = mask.float() # 将mask转为float类型方便计算
+        weights = weights[:seq_len, :].unsqueeze(0).repeat(batch_size, 1, 1)
+        weight_matrix = torch.gather(weights, 2, concepts.unsqueeze(-1)).squeeze(-1)
+        return mask, weight_matrix
 
 class cDKT(DKT):
     def __init__(self, num_c, emb_size, dropout=0.1, emb_type='qid', emb_path="", pretrain_dim=768):

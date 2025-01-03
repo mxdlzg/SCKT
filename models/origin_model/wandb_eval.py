@@ -70,10 +70,10 @@ def main(params):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--save_dir", type=str, default="saved_model/nips_task34_csimplekt_qid_saved_model_42_0_0.1_256_256_2_4_0.5_0.5_0.5_50_256_256_4_2_0.0001_0_1")
+    parser.add_argument("--save_dir", type=str, default="saved_model/nips_task34_cstablekt_qid_saved_model_42_0_0.05_256_256_2_4_256_256_8_4_0.0001_0.5_0.7_0_1")
     parser.add_argument("--test_filename", type=str, default="test.csv")
-    parser.add_argument("--use_pred", type=int, default=0)
-    parser.add_argument("--train_ratio", type=float, default=0.3)
+    parser.add_argument("--use_pred", type=int, default=1)
+    parser.add_argument("--train_ratio", type=float, default=0.8)
     parser.add_argument("--atkt_pad", type=int, default=0)
     parser.add_argument("--use_wandb", type=int, default=0)
 

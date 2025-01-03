@@ -12,14 +12,16 @@ class TimeCausalRegulator(nn.Module):
         self.concept_causal_matrix = nn.Parameter(
             torch.zeros(concept_num)
         )
-        nn.init.constant_(self.time_causal_matrix, 0.5)
-        nn.init.constant_(self.concept_causal_matrix, 0.5)
+        nn.init.constant_(self.time_causal_matrix, 0.1)
+        nn.init.constant_(self.concept_causal_matrix, 0.1)
 
         self.l1_lambda = l1_lambda  # 保存正则化系数
         self.step_norm_loss = 0
 
-    def forward(self, concepts, concept_embs, sample_type="gumbel"):
-        self.step_norm_loss = None
+    def forward(self, concepts, concept_embs, sample_type="bernoulli", epoch=None):
+        self.step_norm_loss = torch.tensor(0)
+        if not self.training or epoch > 40:
+            return concept_embs
         batch_size, seq_len, emb_size = concept_embs.size()
 
         # 1. 获取时间和概念的因果权重并加入温度系数
@@ -64,6 +66,19 @@ class TimeCausalRegulator(nn.Module):
 
         return mask, weight_matrix
 
+    def bernoulli_sample(self, logits, concepts):
+        batch_size, seq_len = concepts.size()
+        # Bernoulli 采样
+        probabilities = torch.sigmoid(logits) # 将logits转为概率
+        mask = torch.bernoulli(probabilities) # 根据概率进行二项分布采样
+
+        # 将采样后的mask转换成权重矩阵，这里我们假设被选中的为1，否则为0
+        weights = mask.float() # 将mask转为float类型方便计算
+        weights = weights[:seq_len, :].unsqueeze(0).repeat(batch_size, 1, 1)
+        weight_matrix = torch.gather(weights, 2, concepts.unsqueeze(-1)).squeeze(-1)
+        return mask, weight_matrix
+
+
 class cSimpleKT(simpleKT):
     def __init__(self, n_question, n_pid,
                  d_model, n_blocks, dropout, d_ff=256,
@@ -77,20 +92,20 @@ class cSimpleKT(simpleKT):
         self.time_regulator = TimeCausalRegulator(n_question, emb_size=d_model, max_len=seq_len)
         self.time_q_regulator = TimeCausalRegulator(3, emb_size=d_model, max_len=seq_len)
 
-    def base_emb(self, q_data, target):
+    def base_emb(self, q_data, target, epoch=None):
         q_embed_data = self.q_embed(q_data)  # BS, seqlen,  d_model# c_ct
         if self.separate_qa:
             qa_data = q_data + self.n_question * target
             qa_embed_data = self.qa_embed(qa_data)
-            qa_embed_data = self.time_q_regulator(qa_data, qa_embed_data)
+            qa_embed_data = self.time_q_regulator(qa_data, qa_embed_data, epoch=epoch)
         else:
             # BS, seqlen, d_model # c_ct+ g_rt =e_(ct,rt)
             qa_embed_data = self.qa_embed(target)+q_embed_data
-            qa_embed_data = self.time_q_regulator(target, qa_embed_data)
+            qa_embed_data = self.time_q_regulator(target, qa_embed_data, epoch=epoch)
 
         return q_embed_data, qa_embed_data
 
-    def forward(self, dcur, qtest=False, train=False):
+    def forward(self, dcur, qtest=False, train=False, epoch=None):
         q, c, r = dcur["qseqs"].long(), dcur["cseqs"].long(), dcur["rseqs"].long()
         qshft, cshft, rshft = dcur["shft_qseqs"].long(), dcur["shft_cseqs"].long(), dcur["shft_rseqs"].long()
         pid_data = torch.cat((q[:,0:1], qshft), dim=1)
@@ -101,14 +116,14 @@ class cSimpleKT(simpleKT):
 
         # Batch First
         if emb_type.startswith("qid"):
-            q_embed_data, qa_embed_data = self.base_emb(q_data, target)
+            q_embed_data, qa_embed_data = self.base_emb(q_data, target, epoch=epoch)
         if self.n_pid > 0 and emb_type.find("norasch") == -1: # have problem id
             if emb_type.find("aktrasch") == -1:
                 q_embed_diff_data = self.q_embed_diff(q_data)  # d_ct 总结了包含当前question（concept）的problems（questions）的变化
                 pid_embed_data = self.difficult_param(pid_data)  # uq 当前problem的难度
                 q_embed_data = q_embed_data + pid_embed_data * \
                     q_embed_diff_data  # uq *d_ct + c_ct # question encoder
-                q_embed_data = self.time_regulator(q_data, q_embed_data)
+                q_embed_data = self.time_regulator(q_data, q_embed_data, epoch=epoch)
 
             else:
                 q_embed_diff_data = self.q_embed_diff(q_data)  # d_ct 总结了包含当前question（concept）的problems（questions）的变化

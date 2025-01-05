@@ -16,7 +16,7 @@ def str2bool(v):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset_name", type=str, default="nips_task34")
-    parser.add_argument("--model_name", type=str, default="dtransformer")
+    parser.add_argument("--model_name", type=str, default="cdtransformer")
     parser.add_argument("--emb_type", type=str, default="qid_cl")
     parser.add_argument("--save_dir", type=str, default="saved_model")
 
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     parser.add_argument("--proj", type=str2bool, default=True)
     parser.add_argument("--hard_neg", type=str2bool, default=False)
 
-    parser.add_argument("--use_wandb", type=int, default=1)
+    parser.add_argument("--use_wandb", type=int, default=0)
     parser.add_argument("--add_uuid", type=int, default=1)
 
     args = parser.parse_args()

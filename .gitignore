@@ -1,2 +1,5 @@
-/models/origin_model/saved_model/
+/models/origin_model/saved_model/**
+/models/origin_model/wandb/**
+/models/causal_model/sckt.egg-info/**
 .idea/
+/venv/**

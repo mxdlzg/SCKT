@@ -2,6 +2,8 @@ import os
 import argparse
 import json
 import copy
+import time
+
 from pykt.config import que_type_models
 import torch
 
@@ -70,14 +72,26 @@ def main(params):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--save_dir", type=str, default="saved_model/nips_task34_cakt_qid_saved_model_3407_0_0.2_256_512_8_4_0.0001_0_1")
+    parser.add_argument("--save_dir", type=str, default="saved_model/xes3g5m_cdkt_qid_saved_model_42_0_0.2_200_0.001_1_1")
     parser.add_argument("--test_filename", type=str, default="test.csv")
     parser.add_argument("--use_pred", type=int, default=1)
-    parser.add_argument("--train_ratio", type=float, default=0.7)
+    parser.add_argument("--train_ratio", type=float, default=0.9)
     parser.add_argument("--atkt_pad", type=int, default=0)
     parser.add_argument("--use_wandb", type=int, default=0)
 
     args = parser.parse_args()
     print(args)
     params = vars(args)
+
+    timestamp_s = time.strftime("%Y%m%d-%H%M%S")
+    start_time = time.time()
+
     main(params)
+
+    # 记录运行时间
+    end_time = time.time()
+    duration = end_time - start_time
+    minutes, seconds = divmod(duration, 60)
+    timestamp_e = time.strftime("%Y%m%d-%H%M%S")
+
+    print(f"Start from {timestamp_s}, End {timestamp_e}, Finished in {int(minutes)}m {int(seconds)}s\n")

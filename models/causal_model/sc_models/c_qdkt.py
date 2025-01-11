@@ -14,13 +14,16 @@ class TimeCausalRegulator(nn.Module):
         self.concept_causal_matrix = nn.Parameter(
             torch.zeros(concept_num)
         )
-        nn.init.constant_(self.time_causal_matrix, 0.5)
-        nn.init.constant_(self.concept_causal_matrix, 0.5)
+        nn.init.constant_(self.time_causal_matrix, 0.1)
+        nn.init.constant_(self.concept_causal_matrix, 0.1)
 
         self.l1_lambda = l1_lambda  # 保存正则化系数
         self.step_norm_loss = 0
 
-    def forward(self, concepts, concept_embs, sample_type="gumbel"):
+    def forward(self, concepts, concept_embs, sample_type="bernoulli", epoch=None):
+        if not self.training or epoch > 60:
+            if sample_type == "bernoulli":
+                return concept_embs
         self.step_norm_loss = None
         batch_size, seq_len, emb_size = concept_embs.size()
 

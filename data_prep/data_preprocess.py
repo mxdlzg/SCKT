@@ -14,7 +14,7 @@ dname2paths = {
     "nips_task34": r"E:\ExtraData\Download\KT_Dataset\EEDI\data\data\train_data_50\train_task_3_4.csv",
     "poj": "../data/poj/poj_log.csv",
     "slepemapy": "../data/slepemapy/answer.csv",
-    "assist2017": "../data/assist2017/anonymized_full_release_competition_dataset.csv",
+    "assist2017": r"E:\ExtraData\Download\KT_Dataset\2017_500\anonymized_full_release_competition_dataset.csv",
     "junyi2015": "../data/junyi2015/junyi_ProblemLog_original.csv",
     "ednet": "../data/ednet/",
     "ednet5w": "../data/ednet/",
@@ -24,10 +24,10 @@ configf = "../configs/data_config.json"
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-d","--dataset_name", type=str, default="nips_task34")
+    parser.add_argument("-d","--dataset_name", type=str, default="assist2017")
     parser.add_argument("-f","--file_path", type=str, default="../data/peiyou/grade3_students_b_200.csv")
     parser.add_argument("-m","--min_seq_len", type=int, default=5)
-    parser.add_argument("-l","--maxlen", type=int, default=50)
+    parser.add_argument("-l","--maxlen", type=int, default=500)
     parser.add_argument("-k","--kfold", type=int, default=5)
     # parser.add_argument("--mode", type=str, default="concept",help="question or concept")
     args = parser.parse_args()

@@ -44,7 +44,7 @@ def main(params):
 
     # for use_pred in [True, False]:
     #     for ratio in [0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
-    print(f"Start predict use_pred: {use_pred}, ratio: {ratio}...")
+    print(f"Start predict use_pred: {use_pred}, ratio: {ratio}... {model.model_name}")
     atkt_pad = True if params["atkt_pad"] == 1 else False
     if model_name == "atkt":
         save_test_path = os.path.join(save_dir,
@@ -72,9 +72,9 @@ def main(params):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--save_dir", type=str, default="saved_model/xes3g5m_cdkt_qid_saved_model_42_0_0.2_200_0.001_1_1")
+    parser.add_argument("--save_dir", type=str, default="saved_model/nips_task34_cqdkt_qid_saved_model_42_0_0.2_300_0.001_32_200_0_1")
     parser.add_argument("--test_filename", type=str, default="test.csv")
-    parser.add_argument("--use_pred", type=int, default=1)
+    parser.add_argument("--use_pred", type=int, default=0)
     parser.add_argument("--train_ratio", type=float, default=0.9)
     parser.add_argument("--atkt_pad", type=int, default=0)
     parser.add_argument("--use_wandb", type=int, default=0)

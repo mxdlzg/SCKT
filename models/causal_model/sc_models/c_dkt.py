@@ -51,7 +51,7 @@ class CausalRegulator(nn.Module):
         return final_embeds, dynamic_causal_matrix
 
 class TimeCausalRegulator(nn.Module):
-    def __init__(self, concept_num, emb_size=200, max_len=200, temperature=0.1, l1_lambda=0.001):
+    def __init__(self, concept_num, emb_size=200, max_len=200, temperature=0.1, l1_lambda=0.001, sample_type="gumbel"):
         super(TimeCausalRegulator, self).__init__()
         self.temperature = temperature
         self.time_causal_matrix = nn.Parameter(
@@ -60,13 +60,14 @@ class TimeCausalRegulator(nn.Module):
         self.concept_causal_matrix = nn.Parameter(
             torch.zeros(concept_num)
         )
-        nn.init.constant_(self.time_causal_matrix, 0.5)
-        nn.init.constant_(self.concept_causal_matrix, 0.5)
+        nn.init.constant_(self.time_causal_matrix, 0.5 if sample_type == "gumbel" else 0.1)
+        nn.init.constant_(self.concept_causal_matrix, 0.5 if sample_type == "gumbel" else 0.1)
 
+        self.sample_type=sample_type
         self.l1_lambda = l1_lambda  # 保存正则化系数
         self.step_norm_loss = 0
 
-    def forward(self, concepts, concept_embs, sample_type="gumbel", testing_sample=False):
+    def forward(self, concepts, concept_embs, testing_sample=False):
         self.step_norm_loss = None
         if not self.training and not testing_sample:
             return concept_embs
@@ -84,9 +85,9 @@ class TimeCausalRegulator(nn.Module):
             self.step_norm_loss = self.l1_lambda * torch.norm(causal_matrix)
 
         # 3. 根据sample_type进行采样
-        if sample_type == "gumbel":
+        if self.sample_type == "gumbel":
             mask, out_concept_weight = self.gumbel_sample(causal_matrix, concepts)
-        elif sample_type == "bernoulli":
+        elif self.sample_type == "bernoulli":
             mask, out_concept_weight = self.bernoulli_sample(causal_matrix, concepts)
         else:
             raise ValueError("Invalid sample_type. Choose 'gumbel' or 'bernoulli'.")
@@ -132,7 +133,7 @@ class cDKT(DKT):
         self.model_name = "cdkt"
         self.sample_type = sample_type
         self.testing_sample = testing_sample
-        self.time_regulator = TimeCausalRegulator(2*num_c+1, emb_size)
+        self.time_regulator = TimeCausalRegulator(2*num_c+1, emb_size, sample_type=sample_type)
 
     def forward(self, q, r):
         emb_type = self.emb_type

@@ -117,6 +117,32 @@
         "test_question_window_file": "test_question_window_sequences.csv"
     },
     "assist2017": {
+        "dpath": "E:/ExtraData/Download/KT_Dataset/2017",
+        "num_q": 3162,
+        "num_c": 102,
+        "input_type": [
+            "questions",
+            "concepts"
+        ],
+        "min_seq_len": 5,
+        "maxlen": 200,
+        "emb_path": "",
+        "train_valid_original_file": "train_valid.csv",
+        "train_valid_file": "train_valid_sequences.csv",
+        "folds": [
+            0,
+            1,
+            2,
+            3,
+            4
+        ],
+        "test_original_file": "test.csv",
+        "test_file": "test_sequences.csv",
+        "test_window_file": "test_window_sequences.csv",
+        "test_question_file": "test_question_sequences.csv",
+        "test_question_window_file": "test_question_window_sequences.csv"
+    },
+    "assist2017_500": {
         "dpath": "E:/ExtraData/Download/KT_Dataset/2017_500",
         "num_q": 3162,
         "num_c": 102,

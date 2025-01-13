@@ -17,7 +17,7 @@ class TimeCausalRegulator(nn.Module):
         nn.init.constant_(self.concept_causal_matrix, 0.1)
 
         self.l1_lambda = l1_lambda  # 保存正则化系数
-        self.step_norm_loss = 0
+        self.step_norm_loss = torch.tensor(0)
 
     def forward(self, concepts, concept_embs, sample_type="bernoulli", epoch=None):
         self.step_norm_loss = torch.tensor(0)
@@ -84,10 +84,13 @@ class TimeCausalRegulator(nn.Module):
 class cAKT(AKT):
     def __init__(self, n_question, n_pid, d_model, n_blocks, dropout, d_ff=256,
                  kq_same=1, final_fc_dim=512, num_attn_heads=8, separate_qa=False, l2=1e-5, emb_type="qid", emb_path="",
-                 pretrain_dim=768):
+                 pretrain_dim=768, use_time=True, use_time_q=True, use_time_pid=True):
         super().__init__(n_question, n_pid, d_model, n_blocks, dropout, d_ff,
                          kq_same, final_fc_dim, num_attn_heads, separate_qa, l2, emb_type, emb_path, pretrain_dim)
         self.model_name = "cakt"
+        self.use_time = use_time
+        self.use_time_q = use_time_q
+        self.use_time_pid = use_time_pid
         self.time_regulator = TimeCausalRegulator(n_question, emb_size=d_model, max_len=200)
         self.time_q_regulator = TimeCausalRegulator(3, emb_size=d_model, max_len=200)
         self.time_pid_regulator = TimeCausalRegulator(n_pid, emb_size=d_model, max_len=200)
@@ -105,7 +108,8 @@ class cAKT(AKT):
             q_embed_data = q_embed_data + pid_embed_data * \
                            q_embed_diff_data  # uq *d_ct + c_ct # question encoder
 
-            q_embed_data = self.time_regulator(q_data, q_embed_data, epoch=epoch)
+            if self.use_time:
+                q_embed_data = self.time_regulator(q_data, q_embed_data, epoch=epoch)
 
             qa_embed_diff_data = self.qa_embed_diff(
                 target)  # f_(ct,rt) or #h_rt (qt, rt)差异向量
@@ -116,8 +120,10 @@ class cAKT(AKT):
                 qa_embed_data = qa_embed_data + pid_embed_data * \
                                 (
                                             qa_embed_diff_data + q_embed_diff_data)  # + uq *(h_rt+d_ct) # （q-response emb diff + question emb diff）
-            qa_embed_data = self.time_q_regulator(target, qa_embed_data, epoch=epoch)
-            pid_embed_data = self.time_pid_regulator(pid_data, pid_embed_data, epoch=epoch)
+            if self.use_time_q:
+                qa_embed_data = self.time_q_regulator(target, qa_embed_data, epoch=epoch)
+            if self.use_time_pid:
+                pid_embed_data = self.time_pid_regulator(pid_data, pid_embed_data, epoch=epoch)
             c_reg_loss = (pid_embed_data ** 2.).sum() * self.l2  # rasch部分loss
         else:
             c_reg_loss = 0.

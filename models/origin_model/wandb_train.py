@@ -48,7 +48,7 @@ def main(params):
         if model_name in ["simplekt", "csimplekt", "stablekt", "cstablekt", "bakt_time", "sparsekt"]:
             train_config["batch_size"] = 64  ## because of OOM
         if model_name in ["gkt","cgkt"]:
-            train_config["batch_size"] = 16
+            train_config["batch_size"] = 256
         if model_name in ["qdkt", "cqdkt", "qikt"] and dataset_name in ['algebra2005', 'bridge2algebra2006']:
             train_config["batch_size"] = 32
         if model_name in ["dtransformer", "cdtransformer"]:

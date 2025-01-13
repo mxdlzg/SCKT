@@ -32,6 +32,8 @@ def main(params):
         seq_len = config["train_config"]["seq_len"]
         if model_name in ["saint", "sakt", "atdkt"]:
             model_config["seq_len"] = seq_len
+        if model_name in ["cdkt"]:
+            model_config["testing_sample"] = trained_params["testing_sample"]
         data_config = config["data_config"]
 
     print(
@@ -72,9 +74,9 @@ def main(params):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--save_dir", type=str, default="saved_model/nips_task34_cqdkt_qid_saved_model_42_0_0.2_300_0.001_32_200_0_1")
+    parser.add_argument("--save_dir", type=str, default="saved_model_sample_test/assist2017_cdkt_qid_saved_model_sample_test_42_0_0.2_200_0.001_bernoulli_False_1_1")
     parser.add_argument("--test_filename", type=str, default="test.csv")
-    parser.add_argument("--use_pred", type=int, default=0)
+    parser.add_argument("--use_pred", type=int, default=1)
     parser.add_argument("--train_ratio", type=float, default=0.9)
     parser.add_argument("--atkt_pad", type=int, default=0)
     parser.add_argument("--use_wandb", type=int, default=0)

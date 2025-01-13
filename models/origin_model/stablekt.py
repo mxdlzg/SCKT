@@ -25,6 +25,8 @@ if __name__ == "__main__":
     parser.add_argument("--r", type=float, default=0.5)
     parser.add_argument("--gamma", type=float, default=0.7)
 
+    parser.add_argument("--early_stop_epoch", type=int, default=100)
+
     # parser.add_argument("--num_buckets", type=int, default=256)
     # parser.add_argument("--max_distance", type=int, default=256)
 
@@ -32,6 +34,10 @@ if __name__ == "__main__":
     parser.add_argument("--add_uuid", type=int, default=1)
 
     args = parser.parse_args()
+
+    # if model_name is cstabelkt, add
+    if args.model_name not in ["cstablekt"]:
+        del args.early_stop_epoch
 
     params = vars(args)
     main(params)

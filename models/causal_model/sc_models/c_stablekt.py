@@ -3,9 +3,10 @@ import torch.nn as nn
 from pykt.models.stablekt import stableKT
 
 class TimeCausalRegulator(nn.Module):
-    def __init__(self, concept_num, emb_size=200, max_len=200, temperature=0.1, l1_lambda=0.001):
+    def __init__(self, concept_num, emb_size=200, max_len=200, temperature=0.1, l1_lambda=0.001, early_stop_epoch=100):
         super(TimeCausalRegulator, self).__init__()
         self.temperature = temperature
+        self.early_stop_epoch = early_stop_epoch
         self.time_causal_matrix = nn.Parameter(
             torch.zeros(max_len)
         )
@@ -20,7 +21,7 @@ class TimeCausalRegulator(nn.Module):
 
     def forward(self, concepts, concept_embs, sample_type="bernoulli", epoch=None):
         self.step_norm_loss = torch.tensor(0)
-        if not self.training or epoch > 60:
+        if not self.training or epoch > self.early_stop_epoch:
             return concept_embs
         batch_size, seq_len, emb_size = concept_embs.size()
 
@@ -84,13 +85,14 @@ class cStableKT(stableKT):
                  d_model, n_blocks, dropout, d_ff=256,
                  loss1=0.5, loss2=0.5, loss3=0.5, start=50, num_layers=2, nheads=4, seq_len=200,
                  kq_same=1, final_fc_dim=512, final_fc_dim2=256, num_attn_heads=8, separate_qa=False, l2=1e-5,
-                 emb_type="qid", r=1, gamma=1, emb_path="", pretrain_dim=768, num_buckets=32, max_distance=100):
+                 emb_type="qid", r=1, gamma=1, emb_path="", pretrain_dim=768, num_buckets=32, max_distance=100,
+                 early_stop_epoch=100):
         super().__init__(n_question, n_pid, d_model, n_blocks, dropout, d_ff, loss1, loss2, loss3, start, num_layers, nheads, seq_len,
                          kq_same, final_fc_dim, final_fc_dim2, num_attn_heads, separate_qa, l2, emb_type, r, gamma, emb_path, pretrain_dim,
                          num_buckets, max_distance)
         self.model_name = "cstablekt"
-        self.time_regulator = TimeCausalRegulator(n_question, emb_size=d_model, max_len=seq_len)
-        self.time_q_regulator = TimeCausalRegulator(3, emb_size=d_model, max_len=seq_len)
+        self.time_regulator = TimeCausalRegulator(n_question, emb_size=d_model, max_len=seq_len, early_stop_epoch=early_stop_epoch)
+        self.time_q_regulator = TimeCausalRegulator(3, emb_size=d_model, max_len=seq_len, early_stop_epoch=early_stop_epoch)
 
     def base_emb(self, q_data, target, epoch=None):
         q_embed_data = self.q_embed(q_data)  # BS, seqlen,  d_model# c_ct

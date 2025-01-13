@@ -66,8 +66,10 @@ class TimeCausalRegulator(nn.Module):
         self.l1_lambda = l1_lambda  # 保存正则化系数
         self.step_norm_loss = 0
 
-    def forward(self, concepts, concept_embs, sample_type="gumbel"):
+    def forward(self, concepts, concept_embs, sample_type="gumbel", testing_sample=False):
         self.step_norm_loss = None
+        if not self.training and not testing_sample:
+            return concept_embs
         batch_size, seq_len, emb_size = concept_embs.size()
 
         # 1. 获取时间和概念的因果权重并加入温度系数
@@ -125,9 +127,11 @@ class TimeCausalRegulator(nn.Module):
         return mask, weight_matrix
 
 class cDKT(DKT):
-    def __init__(self, num_c, emb_size, dropout=0.1, emb_type='qid', emb_path="", pretrain_dim=768):
+    def __init__(self, num_c, emb_size, dropout=0.1, emb_type='qid', emb_path="", pretrain_dim=768, sample_type="gumbel", testing_sample=False):
         super().__init__(num_c, emb_size, dropout, emb_type, emb_path, pretrain_dim)
         self.model_name = "cdkt"
+        self.sample_type = sample_type
+        self.testing_sample = testing_sample
         self.time_regulator = TimeCausalRegulator(2*num_c+1, emb_size)
 
     def forward(self, q, r):
@@ -135,7 +139,7 @@ class cDKT(DKT):
         if emb_type == "qid":
             x = q + self.num_c * r
             xemb = self.interaction_emb(x)
-            xemb = self.time_regulator(x, xemb)
+            xemb = self.time_regulator(x, xemb, sample_type=self.sample_type, testing_sample=self.testing_sample)
         h, _ = self.lstm_layer(xemb)
         h = self.dropout_layer(h)
         y = self.out_layer(h)

@@ -140,7 +140,7 @@ class cDKT(DKT):
         if emb_type == "qid":
             x = q + self.num_c * r
             xemb = self.interaction_emb(x)
-            xemb = self.time_regulator(x, xemb, sample_type=self.sample_type, testing_sample=self.testing_sample)
+            xemb = self.time_regulator(x, xemb, testing_sample=self.testing_sample)
         h, _ = self.lstm_layer(xemb)
         h = self.dropout_layer(h)
         y = self.out_layer(h)

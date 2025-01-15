@@ -5,7 +5,7 @@ from pykt.preprocess.split_datasets_que import main as split_question
 from pykt.preprocess import data_proprocess, process_raw_data
 
 dname2paths = {
-    "assist2009": "../data/assist2009/skill_builder_data_corrected_collapsed.csv",
+    "assist2009": r"E:\ExtraData\Download\KT_Dataset\2009\skill_builder_data_corrected_collapsed.csv",
     "assist2012": "../data/assist2012/2012-2013-data-with-predictions-4-final.csv",
     "assist2015": "../data/assist2015/2015_100_skill_builders_main_problems.csv",
     "algebra2005": "../data/algebra2005/algebra_2005_2006_train.txt",
@@ -24,10 +24,10 @@ configf = "../configs/data_config.json"
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-d","--dataset_name", type=str, default="assist2017")
+    parser.add_argument("-d","--dataset_name", type=str, default="assist2009")
     parser.add_argument("-f","--file_path", type=str, default="../data/peiyou/grade3_students_b_200.csv")
     parser.add_argument("-m","--min_seq_len", type=int, default=5)
-    parser.add_argument("-l","--maxlen", type=int, default=500)
+    parser.add_argument("-l","--maxlen", type=int, default=200)
     parser.add_argument("-k","--kfold", type=int, default=5)
     # parser.add_argument("--mode", type=str, default="concept",help="question or concept")
     args = parser.parse_args()

@@ -105,7 +105,7 @@ def main(params):
     for remove_item in ['use_wandb', 'learning_rate', 'add_uuid', 'l2']:
         if remove_item in model_config:
             del model_config[remove_item]
-    if model_name in ["saint", "saint++", "sakt", "atdkt", "simplekt", "csimplekt", "stablekt", "cstablekt", "bakt_time", "folibikt", "cfolibikt"]:
+    if model_name in ["saint", "saint++", "sakt", "atdkt", "simplekt", "csimplekt", "stablekt", "cstablekt", "bakt_time", "folibikt", "cfolibikt", "cakt", "cdtransformer","crekt"]:
         model_config["seq_len"] = seq_len
 
     debug_print(text="init_model", fuc_name="main")

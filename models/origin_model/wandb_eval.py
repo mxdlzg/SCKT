@@ -30,7 +30,7 @@ def main(params):
         model_name, dataset_name, emb_type = trained_params["model_name"], trained_params["dataset_name"], \
         trained_params["emb_type"]
         seq_len = config["train_config"]["seq_len"]
-        if model_name in ["saint", "sakt", "atdkt","simplekt","csimplekt"]:
+        if model_name in ["saint", "sakt", "atdkt","simplekt","csimplekt", "cstablekt", "cakt", "cdtransformer", "cfolibikt","crekt"]:
             model_config["seq_len"] = seq_len
         if model_name in ["cdkt"]:
             model_config["testing_sample"] = trained_params["testing_sample"]
@@ -74,7 +74,7 @@ def main(params):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--save_dir", type=str, default="saved_model/assist2009_cdkt_qid_saved_model_2009_42_0_0.2_200_0.001_bernoulli_True_1_1_97ecdca6-3dc5-4d47-9ff3-d6a8776b8886")
+    parser.add_argument("--save_dir", type=str, default="saved_model/assist2009_50_cstablekt_qid_saved_model_2009_50_42_0_0.05_256_256_2_4_256_256_8_4_0.0001_0.5_0.7_100_1_1")
     parser.add_argument("--test_filename", type=str, default="test.csv")
     parser.add_argument("--use_pred", type=int, default=1)
     parser.add_argument("--train_ratio", type=float, default=0.9)

@@ -82,12 +82,12 @@ class TimeCausalRegulator(nn.Module):
         return mask, weight_matrix
 
 class cReKT(ReKT):
-    def __init__(self, skill_max, pro_max, d, dropout, emb_type="qid"):
+    def __init__(self, skill_max, pro_max, d, dropout, emb_type="qid", seq_len=200):
         super(cReKT, self).__init__(skill_max, pro_max, d, dropout, emb_type)
         self.model_name = "crekt"
-        self.time_regulator = TimeCausalRegulator(skill_max, emb_size=d, max_len=200)
-        self.time_q_regulator = TimeCausalRegulator(3, emb_size=d, max_len=200)
-        self.time_pid_regulator = TimeCausalRegulator(pro_max, emb_size=d, max_len=200)
+        self.time_regulator = TimeCausalRegulator(skill_max, emb_size=d, max_len=seq_len)
+        self.time_q_regulator = TimeCausalRegulator(3, emb_size=d, max_len=seq_len)
+        self.time_pid_regulator = TimeCausalRegulator(pro_max, emb_size=d, max_len=seq_len)
 
     def forward(self, dcur, qtest=False, train=False, epoch=None):
         """

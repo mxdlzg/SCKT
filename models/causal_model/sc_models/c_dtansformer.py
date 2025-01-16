@@ -88,13 +88,13 @@ class TimeCausalRegulator(nn.Module):
 class cDtransformer(DTransformer):
     def __init__(self, n_question, n_pid, d_model=128, d_ff=256, num_attn_heads=8, n_know=16, n_blocks=3, dropout=0.3,
                  lambda_cl=0.1, proj=False, hard_neg=False, window=1, shortcut=False, separate_qa=False, emb_type="qid",
-                 emb_path=""):
+                 emb_path="", seq_len=200):
         super().__init__(n_question, n_pid, d_model, d_ff, num_attn_heads, n_know, n_blocks, dropout, lambda_cl, proj,
                          hard_neg, window, shortcut, separate_qa, emb_type, emb_path)
         self.model_name = "cdtransformer"
-        self.time_regulator = TimeCausalRegulator(n_question, emb_size=d_model, max_len=200)
-        self.time_q_regulator = TimeCausalRegulator(3, emb_size=d_model, max_len=200)
-        self.time_pid_regulator = TimeCausalRegulator(n_pid, emb_size=d_model, max_len=200)
+        self.time_regulator = TimeCausalRegulator(n_question, emb_size=d_model, max_len=seq_len)
+        self.time_q_regulator = TimeCausalRegulator(3, emb_size=d_model, max_len=seq_len)
+        self.time_pid_regulator = TimeCausalRegulator(n_pid, emb_size=d_model, max_len=seq_len)
 
     def embedding(self, q_data, target, pid_data=None, epoch=None):
         lens = (target >= 0).sum(dim=1)

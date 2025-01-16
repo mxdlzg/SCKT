@@ -84,16 +84,16 @@ class TimeCausalRegulator(nn.Module):
 class cAKT(AKT):
     def __init__(self, n_question, n_pid, d_model, n_blocks, dropout, d_ff=256,
                  kq_same=1, final_fc_dim=512, num_attn_heads=8, separate_qa=False, l2=1e-5, emb_type="qid", emb_path="",
-                 pretrain_dim=768, use_time=True, use_time_q=True, use_time_pid=True):
+                 pretrain_dim=768, use_time=True, use_time_q=True, use_time_pid=True, seq_len=200):
         super().__init__(n_question, n_pid, d_model, n_blocks, dropout, d_ff,
                          kq_same, final_fc_dim, num_attn_heads, separate_qa, l2, emb_type, emb_path, pretrain_dim)
         self.model_name = "cakt"
         self.use_time = use_time
         self.use_time_q = use_time_q
         self.use_time_pid = use_time_pid
-        self.time_regulator = TimeCausalRegulator(n_question, emb_size=d_model, max_len=200)
-        self.time_q_regulator = TimeCausalRegulator(3, emb_size=d_model, max_len=200)
-        self.time_pid_regulator = TimeCausalRegulator(n_pid, emb_size=d_model, max_len=200)
+        self.time_regulator = TimeCausalRegulator(n_question, emb_size=d_model, max_len=seq_len)
+        self.time_q_regulator = TimeCausalRegulator(3, emb_size=d_model, max_len=seq_len)
+        self.time_pid_regulator = TimeCausalRegulator(n_pid, emb_size=d_model, max_len=seq_len)
 
     def forward(self, q_data, target, pid_data=None, qtest=False, epoch=None):
         emb_type = self.emb_type

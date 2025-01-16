@@ -32,8 +32,9 @@ def main(params):
         seq_len = config["train_config"]["seq_len"]
         if model_name in ["saint", "sakt", "atdkt","simplekt","csimplekt", "cstablekt", "cakt", "cdtransformer", "cfolibikt","crekt"]:
             model_config["seq_len"] = seq_len
-        if model_name in ["cdkt"]:
-            model_config["testing_sample"] = trained_params["testing_sample"]
+        if model_name in ["cdkt","cqdkt"]:
+            if "testing_sample" in trained_params:
+                model_config["testing_sample"] = trained_params["testing_sample"]
         data_config = config["data_config"]
 
     print(

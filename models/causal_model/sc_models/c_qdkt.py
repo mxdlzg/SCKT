@@ -4,10 +4,12 @@ import torch.nn.functional as F
 from pykt.models.qdkt import QDKT, QDKTNet
 from pykt.models.que_base_model import QueBaseModel
 
+
 class TimeCausalRegulator(nn.Module):
-    def __init__(self, concept_num, emb_size=200, max_len=200, temperature=0.1, l1_lambda=0.001):
+    def __init__(self, concept_num, emb_size=200, max_len=200, temperature=0.1, l1_lambda=0.001, testing_sample=False):
         super(TimeCausalRegulator, self).__init__()
         self.temperature = temperature
+        self.testing_sample = testing_sample
         self.time_causal_matrix = nn.Parameter(
             torch.zeros(max_len)
         )
@@ -21,9 +23,8 @@ class TimeCausalRegulator(nn.Module):
         self.step_norm_loss = 0
 
     def forward(self, concepts, concept_embs, sample_type="bernoulli", epoch=None):
-        if not self.training or epoch > 60:
-            if sample_type == "bernoulli":
-                return concept_embs
+        if not self.training and not self.testing_sample:
+            return concept_embs
         self.step_norm_loss = None
         batch_size, seq_len, emb_size = concept_embs.size()
 
@@ -103,12 +104,12 @@ class cQDKTNet(QDKTNet):
 
 class cQDKT(QueBaseModel):
     def __init__(self, num_q, num_c, emb_size, dropout=0.1, emb_type='qaid', emb_path="", pretrain_dim=768,
-                 device='cpu', seed=0, mlp_layer_num=1, other_config={}, **kwargs):
+                 device='cpu', seed=0, mlp_layer_num=1, other_config={}, testing_sample=False, **kwargs):
         model_name = "cqdkt"
 
         super().__init__(model_name=model_name, emb_type=emb_type, emb_path=emb_path, pretrain_dim=pretrain_dim,
                          device=device, seed=seed)
-        self.time_regulator = TimeCausalRegulator(2*num_q, emb_size, **other_config)
+        self.time_regulator = TimeCausalRegulator(2*num_q, emb_size, testing_sample=testing_sample, **other_config)
 
         self.model = cQDKTNet(num_q=num_q, num_c=num_c, emb_size=emb_size, dropout=dropout, emb_type=emb_type,
                              emb_path=emb_path, pretrain_dim=pretrain_dim, device=device, mlp_layer_num=mlp_layer_num,

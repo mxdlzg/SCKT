@@ -1,5 +1,4 @@
 import argparse
-import os.path
 import subprocess
 import time
 
@@ -38,7 +37,6 @@ def main():
 
     # 打印日志文件路径
     print(f"Starting evaluation. Logs will be saved to {log_file_path}")
-    print(f"Log file path: {os.path.abspath(log_file_path)}")
     with open(log_file_path, "w") as log:
         tee = Tee(log)  # 创建 Tee 对象
 

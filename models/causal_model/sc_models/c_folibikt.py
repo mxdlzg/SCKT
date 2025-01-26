@@ -22,7 +22,7 @@ class TimeCausalRegulator(nn.Module):
 
     def forward(self, concepts, concept_embs, sample_type="bernoulli", epoch=None):
         self.step_norm_loss = torch.tensor(0)
-        if not self.training or epoch > 60:
+        if not self.training:
             return concept_embs
         batch_size, seq_len, emb_size = concept_embs.size()
 

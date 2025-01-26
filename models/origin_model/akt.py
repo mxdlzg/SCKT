@@ -22,7 +22,7 @@ if __name__ == "__main__":
     parser.add_argument("--use_time_q", action="store_true", default=False)
     parser.add_argument("--use_time_pid", action="store_true", default=False)
 
-    parser.add_argument("--use_wandb", type=int, default=0)
+    parser.add_argument("--use_wandb", type=int, default=1)
     parser.add_argument("--add_uuid", type=int, default=1)
 
     args = parser.parse_args()

@@ -20,8 +20,8 @@ class TimeCausalRegulator(nn.Module):
 
     def forward(self, concepts, concept_embs, sample_type="bernoulli", epoch=None):
         self.step_norm_loss = torch.tensor(0)
-        if not self.training or epoch > 40:
-            return concept_embs
+        if not self.training:
+           return concept_embs
         batch_size, seq_len, emb_size = concept_embs.size()
 
         # 1. 获取时间和概念的因果权重并加入温度系数

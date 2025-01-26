@@ -76,7 +76,7 @@
         "dropout": 0.1
     },
     "gkt": {
-        "learning_rate": 1e-3,
+        "learning_rate": 1e-2,
         "hidden_dim": 32,
         "emb_size": 32,
         "dropout": 0.5

@@ -20,7 +20,7 @@ class TimeCausalRegulator(nn.Module):
         self.step_norm_loss = 0
 
     def forward(self, concepts, concept_embs, sample_type="bernoulli", epoch=None):
-        if not self.training or epoch > 60:
+        if not self.training:
             if sample_type == "bernoulli":
                 return concept_embs
         self.step_norm_loss = None

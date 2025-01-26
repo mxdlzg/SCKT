@@ -3,7 +3,7 @@ import torch.nn as nn
 from pykt.models.stablekt import stableKT
 
 class TimeCausalRegulator(nn.Module):
-    def __init__(self, concept_num, emb_size=200, max_len=200, temperature=0.1, l1_lambda=0.001, early_stop_epoch=100):
+    def __init__(self, concept_num, emb_size=200, max_len=200, temperature=0.1, l1_lambda=0.001, early_stop_epoch=150):
         super(TimeCausalRegulator, self).__init__()
         self.temperature = temperature
         self.early_stop_epoch = early_stop_epoch
